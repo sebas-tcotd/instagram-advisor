@@ -1,0 +1,10 @@
+{
+  "permission": {
+    "read": {
+      "/Users/tcotd/seb-lab/instagram-advisor/.opencode/get-shit-done/*": "allow"
+    },
+    "external_directory": {
+      "/Users/tcotd/seb-lab/instagram-advisor/.opencode/get-shit-done/*": "allow"
+    }
+  }
+}
