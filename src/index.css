@@ -1,0 +1,67 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0d0d0d;
+  --bg-2:      #141414;
+  --bg-3:      #1c1c1c;
+  --border:    rgba(255,255,255,0.08);
+  --border-md: rgba(255,255,255,0.14);
+  --text:      #e8e6e1;
+  --text-2:    #888680;
+  --text-3:    #4a4845;
+  --accent:    #d47c2f;
+  --accent-dim:#7a4518;
+  --green:     #4a7c59;
+  --green-bg:  rgba(74,124,89,0.12);
+  --yellow:    #8a7535;
+  --yellow-bg: rgba(138,117,53,0.12);
+  --red:       #7c4a4a;
+  --red-bg:    rgba(124,74,74,0.12);
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-mono:  'DM Mono', 'Fira Code', monospace;
+  --radius:    6px;
+  --radius-lg: 10px;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--accent-dim); color: var(--text); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+
+input, textarea, select, button {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+input:focus, textarea:focus, select:focus { border-color: var(--border-md); }
+
+button {
+  cursor: pointer;
+  background: transparent;
+  border-color: var(--border-md);
+  padding: 8px 16px;
+  transition: background 0.15s, border-color 0.15s;
+}
+button:hover:not(:disabled) { background: var(--bg-3); border-color: var(--accent-dim); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+textarea { resize: vertical; }
+
+select option { background: var(--bg-2); }

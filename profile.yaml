@@ -1,0 +1,89 @@
+# profile.yaml
+# Datos fijos de @sebas_tcotd — actualizar cuando cambien
+
+identity:
+  name: Sebastián Vargas Pizango
+  display_name: Sebastián Vargas
+  username: sebas_tcotd
+  location: Lima, Perú
+  language_primary: es
+  language_secondary: en
+
+roles:
+  - Fotógrafo artístico (B&N)
+  - Escritor / poeta
+  - Software engineer (Frontend — React, TypeScript, Next.js)
+
+credentials:
+  - Autor de "Sentimientos" (poemario, 2021)
+  - Novela en progreso: "Ciudad del Cercado" (universo Beirou)
+  - Novela en progreso: "Sincronía"
+  - Ingeniero de software con ~3 años en Apply Digital
+
+personality:
+  mbti_adjacent: INFJ/INFP
+  traits:
+    - Introvertido
+    - Orientado al legado — construye cosas que duran
+    - Meticuloso y sistemático
+    - Sensibilidad poética genuina
+    - Voz honesta y precisa, no performativa
+
+visual_strategy:
+  palette: B&N absoluto
+  accent_color: naranja/dorado (solo elemento cromático permitido en feed)
+  accent_reference: portada de "Sentimientos" sobre fondo oscuro
+  breaks_feed:
+    - fotos a color sin intención narrativa
+    - imágenes de IA sin firma visual propia
+    - fondos de estudio (azul, blanco plano)
+
+content_layers:
+  external:
+    - Fotografía B&N (urbana, retratos, naturaleza, arquitectura)
+    - Escritura poética en español
+    - Autor de "Sentimientos"
+    - Software engineer (mencionado con naturalidad, no como CV)
+  internal:
+    - Proceso creativo (cómo fotografía, cómo escribe)
+    - Japonés (estudio activo)
+    - Bajo (música)
+    - Cities: Skylines / worldbuilding / universo Beirou
+    - Archivo fotográfico familiar (fotos desde 1950)
+    - Figma / diseño
+    - Lore sutil — sin nombrarlo, que se sienta
+
+voice:
+  language: español principal, inglés solo si el texto nació en inglés
+  tone:
+    - Honesto y preciso
+    - Vulnerable sin ser lloroso
+    - Poético sin ser pretencioso
+    - Con raíces limeñas visibles
+  avoid:
+    - Jerga de Instagram ("contenido", "comunidad", "proceso creativo" vacío)
+    - Frases motivacionales / Pinterest
+    - Moraleja explícita sobre la foto
+    - CTA de crecimiento ("sígueme", "comparte")
+
+content_mix_weekly:
+  posts: 3
+  distribution:
+    - "2x: Fotografía B&N + caption narrativo personal"
+    - "1x: Proceso / capa interna (making of, japonés, bajo, lore)"
+  stories: diarias (humanización sin editar)
+
+highlights_target:
+  - Libro
+  - Fotos
+  - Proceso
+  - Sebas
+
+bio_target: |
+  📷 Fotografía & escritura desde Lima
+  Autor de Sentimientos · Software engineer
+  Lo cotidiano visto desde lo oscuro
+  ↓ [link]
+
+social:
+  instagram: https://www.instagram.com/sebas_tcotd/

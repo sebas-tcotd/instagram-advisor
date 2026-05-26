@@ -1,0 +1,26 @@
+{
+  "name": "instagram-advisor",
+  "version": "0.1.0",
+  "description": "Instagram content advisor for @sebas_tcotd — powered by Claude",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "doctor": "node scripts/doctor.js",
+    "analyze": "node scripts/analyze.js",
+    "caption": "node scripts/caption.js",
+    "profile": "node scripts/profile.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.0.0",
+    "js-yaml": "^4.1.0",
+    "minimist": "^1.2.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.0"
+  }
+}
