@@ -1,6 +1,9 @@
 import { useState, useRef, useCallback } from 'react'
 
-const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_ANTHROPIC_API_KEY
+console.log({API_KEY, envs: import.meta.env})
+const GEMINI_MODEL = 'gemini-2.5-flash'
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
 
 const STRATEGY = `Eres el Post Advisor de @sebas_tcotd. Analiza posts candidatos para Instagram con base en la estrategia personal de Sebastián Vargas Pizango.
 
@@ -102,13 +105,27 @@ export default function App() {
   const fileRef = useRef()
 
   const loadImage = (file) => {
-    if (!file || !file.type.startsWith('image/')) return
+    if (!file) return
+
+    const fileType = file.type || ''
+    if (!fileType.startsWith('image/')) {
+      setImage(null)
+      setResult(null)
+      setError('Selecciona una imagen válida (jpg, png o webp).')
+      return
+    }
+
     const reader = new FileReader()
     reader.onload = (e) => {
       const dataUrl = e.target.result
-      setImage({ base64: dataUrl.split(',')[1], type: file.type, url: dataUrl })
+      setImage({ base64: dataUrl.split(',')[1], type: fileType, url: dataUrl })
       setResult(null)
       setError(null)
+    }
+    reader.onerror = () => {
+      setImage(null)
+      setResult(null)
+      setError('No se pudo leer la imagen. Intenta con otra.')
     }
     reader.readAsDataURL(file)
   }
@@ -119,28 +136,82 @@ export default function App() {
   }, [])
 
   const callAPI = async (systemPrompt, userText) => {
-    const body = {
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: image.type, data: image.base64 } },
-          { type: 'text', text: userText },
-        ]
-      }]
+    if (!API_KEY) {
+      throw new Error('No se encontró ninguna API key válida en el .env (se intentó VITE_GEMINI_API_KEY y VITE_ANTHROPIC_API_KEY).')
     }
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+
+    if (!image?.base64 || !image?.type) {
+      throw new Error('No hay una imagen cargada para enviar a Gemini.')
+    }
+
+    const body = {
+      systemInstruction: {
+        parts: [{ text: systemPrompt }],
+      },
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              inlineData: {
+                mimeType: image.type,
+                data: image.base64,
+              },
+            },
+            { text: userText },
+          ],
+        },
+      ],
+    }
+
+    const res = await fetch(`${GEMINI_API_URL}/${GEMINI_MODEL}:generateContent?key=${API_KEY}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-client-side-allow-unsafe': 'true' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(body),
     })
-    if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`)
+
+    if (!res.ok) {
+      let detail = res.statusText
+      try {
+        const err = await res.json()
+        detail = err.error?.message || JSON.stringify(err)
+      } catch {
+        // fallback to statusText
+      }
+      throw new Error(`Gemini API ${res.status}: ${detail}`)
+    }
+
     const data = await res.json()
-    const raw = (data.content || []).map(b => b.text || '').join('').trim()
-    const match = raw.match(/\{[\s\S]*\}/)
-    return JSON.parse(match ? match[0] : raw)
+
+    if (data?.promptFeedback?.blockReason) {
+      throw new Error(`Gemini bloqueó la respuesta: ${data.promptFeedback.blockReason}`)
+    }
+
+    const responseText = data?.candidates?.[0]?.content?.parts
+      ?.map((part) => part.text)
+      .filter(Boolean)
+      .join('')
+      .trim()
+
+    if (!responseText) {
+      const finishReason = data?.candidates?.[0]?.finishReason
+      throw new Error(
+        finishReason
+          ? `Gemini no devolvió texto (finishReason: ${finishReason}).`
+          : 'Gemini no devolvió ningún texto.'
+      )
+    }
+
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+    const jsonString = jsonMatch ? jsonMatch[0] : responseText
+
+    try {
+      return JSON.parse(jsonString)
+    } catch (error) {
+      throw new Error(`La respuesta de Gemini no es JSON válido. ${error.message}`)
+    }
   }
 
   const runAnalyze = async () => {
