@@ -2,3 +2,10 @@ allowBuilds:
   '@google/genai': true
   esbuild: false
   protobufjs: false
+
+ignoredBuiltDependencies:
+  - protobufjs
+
+onlyBuiltDependencies:
+  - '@google/genai'
+  - esbuild

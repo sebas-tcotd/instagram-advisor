@@ -1,8 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_ANTHROPIC_API_KEY
-console.log({API_KEY, envs: import.meta.env})
-const GEMINI_MODEL = 'gemini-2.5-flash'
+const GEMINI_MODEL = 'gemini-3.5-flash'
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
 
 const STRATEGY = `Eres el Post Advisor de @sebas_tcotd. Analiza posts candidatos para Instagram con base en la estrategia personal de Sebastián Vargas Pizango.
