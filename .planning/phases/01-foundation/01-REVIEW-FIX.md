@@ -1,23 +1,23 @@
 ---
 phase: 01-foundation
-fixed_at: 2026-05-27T16:49:00Z
+fixed_at: 2026-05-27T17:00:00Z
 review_path: .planning/phases/01-foundation/01-REVIEW.md
 iteration: 1
-findings_in_scope: 10
-fixed: 9
+findings_in_scope: 13
+fixed: 12
 skipped: 1
 status: partial
 ---
 
 # Phase 01: Code Review Fix Report
 
-**Fixed at:** 2026-05-27T16:49:00Z
+**Fixed at:** 2026-05-27T17:00:00Z
 **Source review:** `.planning/phases/01-foundation/01-REVIEW.md`
 **Iteration:** 1
 
 **Summary:**
-- Findings in scope: 10 (4 Critical + 6 Warning)
-- Fixed: 9
+- Findings in scope: 13 (4 Critical + 6 Warning + 3 Info)
+- Fixed: 12
 - Skipped: 1 (CR-01, per user instruction)
 
 ## Fixed Issues
@@ -34,7 +34,7 @@ status: partial
 
 **Files modified:** `src/infrastructure/ai/AnthropicProvider.ts`, `src/infrastructure/ai/GeminiProvider.ts`, `src/ui/hooks/useAIProvider.ts`
 **Commit:** aa1f0b9
-**Applied fix:** Replaced the single-pass greedy `/\{[\s\S]*\}/` regex in all three locations with a strip-markdown-fences-first approach: strip triple-backtick fences (`` ```json `` or plain ` ``` ``) from the response text, attempt `JSON.parse` on the stripped string directly, and only fall back to a greedy regex match if the first parse fails. This handles the common pattern of models wrapping JSON in code fences, while still recovering from extra text around a JSON object.
+**Applied fix:** Replaced the single-pass greedy `/\{[\s\S]*\}/` regex in all three locations with a strip-markdown-fences-first approach: strip triple-backtick fences (` ```json ` or plain ` ``` `) from the response text, attempt `JSON.parse` on the stripped string directly, and only fall back to a greedy regex match if the first parse fails. This handles the common pattern of models wrapping JSON in code fences, while still recovering from extra text around a JSON object.
 
 ---
 
@@ -94,6 +94,30 @@ status: partial
 
 ---
 
+### IN-01: Debug `console.log` left in production module
+
+**Files modified:** none (not needed)
+**Commit:** n/a
+**Applied fix:** Skipped — the `console.log({model})` statement cited at `src/ui/hooks/useAIProvider.ts:13` was not present in the current file. The debug statement was already removed in the prior pass or was never committed to this version of the file. No change needed.
+
+---
+
+### IN-02: `assembleSystemPrompt` is duplicated between AnthropicProvider and GeminiProvider
+
+**Files modified:** `src/infrastructure/ai/promptUtils.ts` (new), `src/infrastructure/ai/AnthropicProvider.ts`, `src/infrastructure/ai/GeminiProvider.ts`
+**Commit:** edf1432
+**Applied fix:** Extracted the identical `assembleSystemPrompt` function from both providers into a new shared module `src/infrastructure/ai/promptUtils.ts`. Removed the local definitions from both providers and replaced them with a named import from `./promptUtils`. The unused `readFileSync` and `resolve` imports were also removed from both providers as a result.
+
+---
+
+### IN-03: `Verdict` type not enforced in `validatePostAnalysisResult`
+
+**Files modified:** `src/infrastructure/ai/AnthropicProvider.ts`, `src/infrastructure/ai/GeminiProvider.ts`
+**Commit:** 1cbf1ef
+**Applied fix:** Added `Verdict` to the import from `PostAnalysisResult` in both providers. Added a `VALID_VERDICTS: readonly Verdict[]` constant (`['listo', 'ajustar', 'no va']`) and an `includes()` check after the structural field validation. If the AI returns a verdict string not in the valid set, the validator now throws a descriptive error with the actual value received, instead of silently passing through to `VerdictBadge`'s fallback mapping.
+
+---
+
 ## Skipped Issues
 
 ### CR-01: `config.yaml` references a non-existent Gemini model
@@ -106,11 +130,11 @@ status: partial
 
 ## Verification
 
-- `pnpm typecheck`: passed (0 errors)
-- `pnpm test`: passed (24/24 tests, 5 test files)
+- `pnpm typecheck`: passed (0 errors) — verified in both passes
+- `pnpm test`: passed (24/24 tests, 5 test files) — verified in both passes
 
 ---
 
-_Fixed: 2026-05-27T16:49:00Z_
+_Fixed: 2026-05-27T17:00:00Z_
 _Fixer: Claude (gsd-code-fixer)_
 _Iteration: 1_
