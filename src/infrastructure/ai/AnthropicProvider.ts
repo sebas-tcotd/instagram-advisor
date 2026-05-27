@@ -49,11 +49,16 @@ function validateCaptionResult(parsed: unknown): CaptionResult {
 }
 
 function extractJSON(raw: string): unknown {
-  const match = raw.match(/\{[\s\S]*\}/);
+  const stripped = raw.replace(/^```(?:json)?\n?|```$/gm, '').trim();
   try {
-    return JSON.parse(match ? match[0] : raw) as unknown;
-  } catch (err) {
-    throw new Error(`Anthropic response is not valid JSON: ${String(err)}\nRaw: ${raw}`, { cause: err });
+    return JSON.parse(stripped) as unknown;
+  } catch {
+    const match = stripped.match(/\{[\s\S]*\}/);
+    try {
+      return JSON.parse(match ? match[0] : stripped) as unknown;
+    } catch (err) {
+      throw new Error(`Anthropic response is not valid JSON: ${String(err)}\nRaw: ${raw}`, { cause: err });
+    }
   }
 }
 

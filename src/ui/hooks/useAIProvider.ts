@@ -88,13 +88,16 @@ async function callGemini(
     )
   }
 
-  const jsonMatch = responseText.match(/\{[\s\S]*\}/)
-  const jsonString = jsonMatch ? jsonMatch[0] : responseText
-
+  const stripped = responseText.replace(/^```(?:json)?\n?|```$/gm, '').trim()
   try {
-    return JSON.parse(jsonString) as unknown
-  } catch (err) {
-    throw new Error(`La respuesta de Gemini no es JSON válido. ${(err as Error).message}`, { cause: err })
+    return JSON.parse(stripped) as unknown
+  } catch {
+    const match = stripped.match(/\{[\s\S]*\}/)
+    try {
+      return JSON.parse(match ? match[0] : stripped) as unknown
+    } catch (err) {
+      throw new Error(`La respuesta de Gemini no es JSON válido. ${(err as Error).message}`, { cause: err })
+    }
   }
 }
 
