@@ -30,7 +30,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. config.yaml exists at the repo root; changing `ai.provider` from `gemini` to `anthropic` makes the next CLI or UI call use the other provider without any code change
   4. `npm run analyze` and `npm run caption` both produce correct output via the new AnalyzePost and GenerateCaption use cases
   5. The AIProvider port interface lives in src/domain/ports/ and is the only thing application layer depends on for AI calls
-**Plans**: TBD
+**Plans**: 6 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Tooling scaffold (tsconfig, eslint, vitest, vite.config.ts, config.yaml, dist/ cleanup)
+- [ ] 01-02-PLAN.md — Domain contracts (entities + AIProvider port interface)
+- [ ] 01-03-PLAN.md — Infrastructure layer (loadConfig, GeminiProvider, AnthropicProvider, AIProviderFactory + tests)
+- [ ] 01-04-PLAN.md — Application use cases (AnalyzePost, GenerateCaption, AuditProfile scaffold + tests)
+- [ ] 01-05-PLAN.md — CLI entry points (analyze.ts, caption.ts, doctor.ts; delete scripts/*.js; human smoke test)
+- [ ] 01-06-PLAN.md — UI layer migration (App.tsx split, components, hooks with ?raw prompt loading; human verify)
 
 ### Phase 2: Profile Auditor
 **Goal**: The profile-auditor agent is fully operational: a developer can run `npm run profile` from the terminal and open a Profile tab in the web UI, both of which return a structured audit with scores, strengths, improvement areas, and concrete recommendations
@@ -76,7 +84,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/6 | Not started | - |
 | 2. Profile Auditor | 0/TBD | Not started | - |
 | 3. UI Polish | 0/TBD | Not started | - |
 | 4. Ship-Ready | 0/TBD | Not started | - |
