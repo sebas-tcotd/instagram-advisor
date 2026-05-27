@@ -65,3 +65,5 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 textarea { resize: vertical; }
 
 select option { background: var(--bg-2); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
