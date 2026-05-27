@@ -42,7 +42,7 @@ export default function App() {
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const loadImage = (file: File | null | undefined) => {
+  const loadImage = useCallback((file: File | null | undefined) => {
     if (!file) return
 
     const fileType = file.type || ''
@@ -58,12 +58,12 @@ export default function App() {
     }
     reader.onerror = () => { setImage(null) }
     reader.readAsDataURL(file)
-  }
+  }, [])
 
   const onDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault(); setDragging(false)
     loadImage(e.dataTransfer.files[0])
-  }, [])
+  }, [loadImage])
 
   return (
     <div style={s.root}>
