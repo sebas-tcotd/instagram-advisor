@@ -9,6 +9,9 @@ export default defineConfig({
   build: { outDir: '../dist' },
   server: { port: 5173 },
   resolve: {
-    alias: { '@prompts': resolve(__dirname, 'prompts') },
+    alias: {
+      '@prompts':  resolve(__dirname, 'prompts'),
+      '@root':     resolve(__dirname),
+    },
   },
 })
