@@ -56,10 +56,12 @@ async function callGemini(
   imageBase64: string,
   mimeType: string,
   userText: string,
+  maxTokens: number,
 ): Promise<unknown> {
   const url = `${GEMINI_BASE_URL}/${model}:generateContent`;
   const body = {
     systemInstruction: { parts: [{ text: systemPrompt }] },
+    generationConfig: { maxOutputTokens: maxTokens },
     contents: [{
       role: 'user',
       parts: [
@@ -132,6 +134,7 @@ export class GeminiProvider implements AIProvider {
       req.imageBase64,
       req.mimeType,
       userText,
+      this.config.ai.max_tokens,
     );
     return validatePostAnalysisResult(parsed);
   }
@@ -146,6 +149,7 @@ export class GeminiProvider implements AIProvider {
       req.imageBase64,
       req.mimeType,
       userText,
+      this.config.ai.max_tokens,
     );
     return validateCaptionResult(parsed);
   }

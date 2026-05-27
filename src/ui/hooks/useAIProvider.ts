@@ -8,8 +8,9 @@ import configRaw from '@root/config.yaml?raw'
 import type { PostAnalysisResult } from '../../domain/entities/PostAnalysisResult'
 import type { CaptionResult } from '../../domain/entities/CaptionResult'
 
-// Detect model from config.yaml at Vite build time
+// Detect model and max_tokens from config.yaml at Vite build time
 const model = configRaw.match(/model:\s*(\S+)/)?.[1] ?? 'gemini-2.0-flash'
+const maxTokens = parseInt(configRaw.match(/max_tokens:\s*(\d+)/)?.[1] ?? '1024', 10)
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
 const API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined)
   || (import.meta.env.VITE_ANTHROPIC_API_KEY as string | undefined)
@@ -36,6 +37,7 @@ async function callGemini(
     systemInstruction: {
       parts: [{ text: systemPrompt }],
     },
+    generationConfig: { maxOutputTokens: maxTokens },
     contents: [
       {
         role: 'user',
