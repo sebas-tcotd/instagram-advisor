@@ -53,7 +53,7 @@ function extractJSON(raw: string): unknown {
   try {
     return JSON.parse(match ? match[0] : raw) as unknown;
   } catch (err) {
-    throw new Error(`Anthropic response is not valid JSON: ${String(err)}\nRaw: ${raw}`);
+    throw new Error(`Anthropic response is not valid JSON: ${String(err)}\nRaw: ${raw}`, { cause: err });
   }
 }
 
@@ -108,7 +108,7 @@ export class AnthropicProvider implements AIProvider {
     return validateCaptionResult(parsed);
   }
 
-  async auditProfile(_profileYaml: string): Promise<AuditResult> {
-    throw new Error('AuditProfile not implemented — Phase 2');
+  auditProfile(_profileYaml: string): Promise<AuditResult> {
+    return Promise.reject(new Error('AuditProfile not implemented — Phase 2'));
   }
 }

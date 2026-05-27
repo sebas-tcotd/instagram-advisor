@@ -27,7 +27,7 @@ const mockResult: PostAnalysisResult = {
 describe('AnalyzePost', () => {
   it('calls provider.analyzePost exactly once with the request object', async () => {
     const provider = makeProvider();
-    vi.mocked(provider.analyzePost).mockResolvedValue(mockResult);
+    vi.mocked(provider).analyzePost.mockResolvedValue(mockResult);
 
     const useCase = new AnalyzePost(provider);
     await useCase.execute(mockRequest);
@@ -38,7 +38,7 @@ describe('AnalyzePost', () => {
 
   it('returns the resolved value from provider.analyzePost', async () => {
     const provider = makeProvider();
-    vi.mocked(provider.analyzePost).mockResolvedValue(mockResult);
+    vi.mocked(provider).analyzePost.mockResolvedValue(mockResult);
 
     const useCase = new AnalyzePost(provider);
     const result = await useCase.execute(mockRequest);
@@ -49,7 +49,7 @@ describe('AnalyzePost', () => {
   it('propagates errors thrown by provider.analyzePost', async () => {
     const provider = makeProvider();
     const error = new Error('Provider failure');
-    vi.mocked(provider.analyzePost).mockRejectedValue(error);
+    vi.mocked(provider).analyzePost.mockRejectedValue(error);
 
     const useCase = new AnalyzePost(provider);
 

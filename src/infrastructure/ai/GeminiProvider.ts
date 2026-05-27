@@ -106,7 +106,7 @@ async function callGemini(
   try {
     return JSON.parse(jsonMatch ? jsonMatch[0] : responseText) as unknown;
   } catch (err) {
-    throw new Error(`Gemini response is not valid JSON: ${String(err)}`);
+    throw new Error(`Gemini response is not valid JSON: ${String(err)}`, { cause: err });
   }
 }
 
@@ -141,7 +141,7 @@ export class GeminiProvider implements AIProvider {
     return validateCaptionResult(parsed);
   }
 
-  async auditProfile(_profileYaml: string): Promise<AuditResult> {
-    throw new Error('AuditProfile not implemented — Phase 2');
+  auditProfile(_profileYaml: string): Promise<AuditResult> {
+    return Promise.reject(new Error('AuditProfile not implemented — Phase 2'));
   }
 }
