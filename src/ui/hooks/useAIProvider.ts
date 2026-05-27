@@ -129,6 +129,14 @@ ${caption ? `Caption: "${caption}"` : 'Sin caption — evalúa desde la imagen y
         mimeType,
         userText
       )
+      if (
+        !parsed ||
+        typeof parsed !== 'object' ||
+        !('verdict' in parsed) ||
+        !('scores' in parsed)
+      ) {
+        throw new Error('Gemini devolvió JSON con formato inesperado.')
+      }
       setResult(parsed as PostAnalysisResult)
     } catch (e) {
       setError((e as Error).message)
@@ -155,6 +163,14 @@ export function useGenerateCaption() {
         mimeType,
         userText
       )
+      if (
+        !parsed ||
+        typeof parsed !== 'object' ||
+        !('captions' in parsed) ||
+        !Array.isArray((parsed as Record<string, unknown>)['captions'])
+      ) {
+        throw new Error('Gemini devolvió JSON con formato inesperado.')
+      }
       setResult(parsed as CaptionResult)
     } catch (e) {
       setError((e as Error).message)
