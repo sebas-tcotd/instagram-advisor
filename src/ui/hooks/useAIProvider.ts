@@ -47,9 +47,12 @@ async function callGemini(
     ],
   }
 
-  const res = await fetch(`${GEMINI_API_URL}/${model}:generateContent?key=${API_KEY}`, {
+  const res = await fetch(`${GEMINI_API_URL}/${model}:generateContent`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': API_KEY,
+    },
     body: JSON.stringify(body),
   })
 
