@@ -2,11 +2,13 @@ import Anthropic from '@anthropic-ai/sdk';
 import type { AIProvider } from '../../domain/ports/AIProvider';
 import type { AnalyzeRequest } from '../../domain/entities/AnalyzeRequest';
 import type { CaptionRequest } from '../../domain/entities/CaptionRequest';
-import type { PostAnalysisResult } from '../../domain/entities/PostAnalysisResult';
+import type { PostAnalysisResult, Verdict } from '../../domain/entities/PostAnalysisResult';
 import type { CaptionResult } from '../../domain/entities/CaptionResult';
 import type { AuditResult } from '../../domain/entities/AuditResult';
 import type { AppConfig } from '../config/loadConfig';
 import { assembleSystemPrompt } from './promptUtils';
+
+const VALID_VERDICTS: readonly Verdict[] = ['listo', 'ajustar', 'no va'];
 
 function validatePostAnalysisResult(parsed: unknown): PostAnalysisResult {
   const obj = parsed as Record<string, unknown>;
@@ -21,6 +23,9 @@ function validatePostAnalysisResult(parsed: unknown): PostAnalysisResult {
     typeof (obj['scores'] as Record<string, unknown>)['fit'] !== 'string'
   ) {
     throw new Error('Anthropic response missing required PostAnalysisResult fields');
+  }
+  if (!VALID_VERDICTS.includes(obj['verdict'] as Verdict)) {
+    throw new Error(`Invalid verdict value: "${String(obj['verdict'])}". Expected one of: ${VALID_VERDICTS.join(', ')}`);
   }
   return parsed as PostAnalysisResult;
 }
