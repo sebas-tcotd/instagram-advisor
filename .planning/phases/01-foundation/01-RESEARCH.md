@@ -653,7 +653,7 @@ export interface PostAnalysisResult {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **UI config.yaml at build time vs runtime env var**
    - What we know: UI is a static SPA built by Vite; `config.yaml` read via `?raw` is embedded at build time; PROV-05 requires switching providers without code changes
