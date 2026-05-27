@@ -1,0 +1,6 @@
+ai:
+  provider: gemini          # change to "anthropic" to switch providers (PROV-05)
+  model: gemini-2.0-flash
+  max_tokens: 1024
+prompts_dir: ./prompts
+profile_path: ./profile.yaml
