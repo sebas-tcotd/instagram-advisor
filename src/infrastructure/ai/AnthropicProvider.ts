@@ -1,6 +1,4 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import type { AIProvider } from '../../domain/ports/AIProvider';
 import type { AnalyzeRequest } from '../../domain/entities/AnalyzeRequest';
 import type { CaptionRequest } from '../../domain/entities/CaptionRequest';
@@ -8,14 +6,7 @@ import type { PostAnalysisResult } from '../../domain/entities/PostAnalysisResul
 import type { CaptionResult } from '../../domain/entities/CaptionResult';
 import type { AuditResult } from '../../domain/entities/AuditResult';
 import type { AppConfig } from '../config/loadConfig';
-
-function assembleSystemPrompt(promptFile: string, config: AppConfig): string {
-  const promptsDir = resolve(process.cwd(), config.prompts_dir);
-  const agentPrompt = readFileSync(resolve(promptsDir, promptFile), 'utf8');
-  const strategy = readFileSync(resolve(promptsDir, 'strategy.md'), 'utf8');
-  const profile = readFileSync(resolve(process.cwd(), config.profile_path), 'utf8');
-  return `${agentPrompt}\n\n---\n\n## Estrategia completa\n\n${strategy}\n\n## Perfil\n\n${profile}`;
-}
+import { assembleSystemPrompt } from './promptUtils';
 
 function validatePostAnalysisResult(parsed: unknown): PostAnalysisResult {
   const obj = parsed as Record<string, unknown>;
