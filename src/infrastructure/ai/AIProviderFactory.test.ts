@@ -1,34 +1,37 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createAIProvider } from './AIProviderFactory';
-import type { AppConfig } from '../config/loadConfig';
 
-// Mock loadConfig to avoid filesystem access in unit tests
+// Mock modules before importing the module under test
 vi.mock('../config/loadConfig', () => ({
   loadConfig: vi.fn(),
 }));
 
-// Mock providers to avoid real API calls
-vi.mock('./GeminiProvider', () => ({
-  GeminiProvider: vi.fn().mockImplementation((config: AppConfig) => ({
-    _config: config,
-    analyzePost: vi.fn(),
-    generateCaption: vi.fn(),
-    auditProfile: vi.fn(),
-  })),
-}));
+vi.mock('./GeminiProvider', () => {
+  return {
+    GeminiProvider: vi.fn().mockImplementation(function (this: Record<string, unknown>, config: unknown) {
+      this['_config'] = config;
+      this['analyzePost'] = vi.fn();
+      this['generateCaption'] = vi.fn();
+      this['auditProfile'] = vi.fn();
+    }),
+  };
+});
 
-vi.mock('./AnthropicProvider', () => ({
-  AnthropicProvider: vi.fn().mockImplementation((config: AppConfig) => ({
-    _config: config,
-    analyzePost: vi.fn(),
-    generateCaption: vi.fn(),
-    auditProfile: vi.fn(),
-  })),
-}));
+vi.mock('./AnthropicProvider', () => {
+  return {
+    AnthropicProvider: vi.fn().mockImplementation(function (this: Record<string, unknown>, config: unknown) {
+      this['_config'] = config;
+      this['analyzePost'] = vi.fn();
+      this['generateCaption'] = vi.fn();
+      this['auditProfile'] = vi.fn();
+    }),
+  };
+});
 
+import { createAIProvider } from './AIProviderFactory';
 import { loadConfig } from '../config/loadConfig';
 import { GeminiProvider } from './GeminiProvider';
 import { AnthropicProvider } from './AnthropicProvider';
+import type { AppConfig } from '../config/loadConfig';
 
 const mockLoadConfig = vi.mocked(loadConfig);
 
@@ -66,7 +69,7 @@ describe('createAIProvider', () => {
     expect(provider).toHaveProperty('auditProfile');
   });
 
-  it('passes config to the provider constructor', () => {
+  it('passes the loaded config to the provider constructor', () => {
     const config = makeConfig('gemini');
     mockLoadConfig.mockReturnValue(config);
 
@@ -75,7 +78,7 @@ describe('createAIProvider', () => {
     expect(GeminiProvider).toHaveBeenCalledWith(config);
   });
 
-  it('uses the configPath parameter when provided', () => {
+  it('forwards configPath to loadConfig when provided', () => {
     mockLoadConfig.mockReturnValue(makeConfig('anthropic'));
 
     createAIProvider('/custom/config.yaml');
