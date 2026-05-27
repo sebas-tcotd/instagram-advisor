@@ -47,6 +47,16 @@ export function loadConfig(configPath?: string): AppConfig {
     throw new Error("ai.provider must be 'gemini' or 'anthropic'");
   }
 
+  if (!parsed?.ai?.model || typeof parsed.ai.model !== 'string') {
+    throw new Error('config.yaml: ai.model must be a non-empty string');
+  }
+  if (typeof parsed?.ai?.max_tokens !== 'number') {
+    throw new Error('config.yaml: ai.max_tokens must be a number');
+  }
+  if (!parsed?.prompts_dir || !parsed?.profile_path) {
+    throw new Error('config.yaml: prompts_dir and profile_path are required');
+  }
+
   const apiKey =
     provider === 'anthropic'
       ? (process.env['ANTHROPIC_API_KEY'] ?? '')
