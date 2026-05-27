@@ -7,10 +7,10 @@ import { createAIProvider } from '../infrastructure/ai/AIProviderFactory';
 import { AnalyzePost } from '../application/AnalyzePost';
 
 const args = minimist(process.argv.slice(2));
-const photo = args._[0] || args.photo;
-const caption = args.caption || null;
-const format = args.format || 'post_individual';
-const layer = args.layer || 'externa';
+const photo = (args._[0] ?? args.photo) as string | undefined;
+const caption = (args.caption ?? null) as string | null;
+const format = (args.format ?? 'post_individual') as string;
+const layer = (args.layer ?? 'externa') as string;
 
 const BOLD = '\x1b[1m';
 const DIM = '\x1b[2m';
@@ -24,7 +24,7 @@ if (!photo) {
   process.exit(1);
 }
 
-const photoPath = resolve(process.cwd(), photo);
+const photoPath = resolve(process.cwd(), photo ?? '');
 if (!existsSync(photoPath)) {
   console.error(`\n${RED}No se encuentra la foto: ${photoPath}${RESET}\n`);
   process.exit(1);

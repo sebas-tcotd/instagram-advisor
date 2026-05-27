@@ -94,7 +94,7 @@ async function callGemini(
   try {
     return JSON.parse(jsonString) as unknown
   } catch (err) {
-    throw new Error(`La respuesta de Gemini no es JSON válido. ${(err as Error).message}`)
+    throw new Error(`La respuesta de Gemini no es JSON válido. ${(err as Error).message}`, { cause: err })
   }
 }
 

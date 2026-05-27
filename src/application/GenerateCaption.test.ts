@@ -32,8 +32,10 @@ describe('GenerateCaption', () => {
     const useCase = new GenerateCaption(provider);
     await useCase.execute(mockRequest);
 
-    expect(provider.generateCaption).toHaveBeenCalledTimes(1);
-    expect(provider.generateCaption).toHaveBeenCalledWith(mockRequest);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(vi.mocked(provider.generateCaption)).toHaveBeenCalledTimes(1);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(vi.mocked(provider.generateCaption)).toHaveBeenCalledWith(mockRequest);
   });
 
   it('returns the resolved value from provider.generateCaption', async () => {

@@ -84,11 +84,12 @@ Two tasks executed to migrate the three CLI scripts to TypeScript and delete the
 
 ## Checkpoint Status
 
-**Task 3 (checkpoint:human-verify)** is pending — human must run:
-- `pnpm run analyze -- <image>` and verify structured output
-- `pnpm run caption -- <image>` and verify caption output
-- `pnpm run doctor` and verify all checks pass
-- Provider switching via config.yaml (PROV-05 end-to-end validation)
+**Task 3 (checkpoint:human-verify)** — ✅ APPROVED by user
+
+Verified 2026-05-27 with Gemini provider:
+- `pnpm run doctor` — all 7 checks pass (config, prompts, profile, API key)
+- `pnpm run analyze -- test.png` — returned structured JSON: verdict "ajustar", visual 6/10, fit 6/10, 3 actionable suggestions in Spanish
+- `pnpm run caption -- test.png` — returned 2 caption variants (narrativo + tensión) with hook types and editorial note
 
 ## Deviations from Plan
 

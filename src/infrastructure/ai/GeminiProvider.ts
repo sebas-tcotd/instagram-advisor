@@ -87,7 +87,8 @@ async function callGemini(
   const data = await res.json() as Record<string, unknown>;
   const feedback = data['promptFeedback'] as Record<string, unknown> | undefined;
   if (feedback?.['blockReason']) {
-    throw new Error(`Gemini bloqueó la respuesta: ${String(feedback['blockReason'])}`);
+    const reason = typeof feedback['blockReason'] === 'string' ? feedback['blockReason'] : JSON.stringify(feedback['blockReason']);
+    throw new Error(`Gemini bloqueó la respuesta: ${reason}`);
   }
 
   const parts = (data['candidates'] as Record<string, unknown>[] | undefined)
@@ -141,6 +142,7 @@ export class GeminiProvider implements AIProvider {
     return validateCaptionResult(parsed);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   auditProfile(_profileYaml: string): Promise<AuditResult> {
     return Promise.reject(new Error('AuditProfile not implemented — Phase 2'));
   }

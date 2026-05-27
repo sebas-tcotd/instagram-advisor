@@ -108,6 +108,7 @@ export class AnthropicProvider implements AIProvider {
     return validateCaptionResult(parsed);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   auditProfile(_profileYaml: string): Promise<AuditResult> {
     return Promise.reject(new Error('AuditProfile not implemented — Phase 2'));
   }

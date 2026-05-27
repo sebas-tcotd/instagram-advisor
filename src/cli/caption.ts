@@ -7,8 +7,8 @@ import { createAIProvider } from '../infrastructure/ai/AIProviderFactory';
 import { GenerateCaption } from '../application/GenerateCaption';
 
 const args = minimist(process.argv.slice(2));
-const photo = args._[0] || args.photo;
-const tone = args.tone || 'narrativo';
+const photo = (args._[0] ?? args.photo) as string | undefined;
+const tone = (args.tone ?? 'narrativo') as string;
 
 const BOLD = '\x1b[1m';
 const DIM = '\x1b[2m';
@@ -21,7 +21,7 @@ if (!photo) {
   process.exit(1);
 }
 
-const photoPath = resolve(process.cwd(), photo);
+const photoPath = resolve(process.cwd(), photo ?? '');
 if (!existsSync(photoPath)) {
   console.error(`\n${RED}No se encuentra la foto: ${photoPath}${RESET}\n`);
   process.exit(1);

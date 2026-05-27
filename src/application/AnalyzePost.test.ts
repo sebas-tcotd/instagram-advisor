@@ -32,8 +32,10 @@ describe('AnalyzePost', () => {
     const useCase = new AnalyzePost(provider);
     await useCase.execute(mockRequest);
 
-    expect(provider.analyzePost).toHaveBeenCalledTimes(1);
-    expect(provider.analyzePost).toHaveBeenCalledWith(mockRequest);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(vi.mocked(provider.analyzePost)).toHaveBeenCalledTimes(1);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(vi.mocked(provider.analyzePost)).toHaveBeenCalledWith(mockRequest);
   });
 
   it('returns the resolved value from provider.analyzePost', async () => {
