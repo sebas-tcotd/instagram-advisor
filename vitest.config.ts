@@ -5,6 +5,7 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     passWithNoTests: true,
+    exclude: ['**/node_modules/**', '**/.git/**', '**/.claude/worktrees/**'],
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
