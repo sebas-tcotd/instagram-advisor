@@ -1,12 +1,13 @@
 interface Props { label: string; score: string }
 
 export function ScoreBar({ label, score }: Props) {
-  const [num] = score.split('/')
-  const pct = (parseInt(num) / 10) * 100
+  const match = score.match(/^(\d+)\s*\/\s*(\d+)$/)
+  const pct = match ? (parseInt(match[1]) / parseInt(match[2])) * 100 : 0
+  const displayScore = match ? score : score || '—'
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-2)', fontSize: 11 }}>
-        <span>{label}</span><span style={{ color: 'var(--text)', fontWeight: 500 }}>{score}</span>
+        <span>{label}</span><span style={{ color: 'var(--text)', fontWeight: 500 }}>{displayScore}</span>
       </div>
       <div style={{ height: 2, background: 'var(--bg-3)', borderRadius: 1 }}>
         <div style={{
