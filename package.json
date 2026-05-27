@@ -13,8 +13,7 @@
     "coverage": "vitest run --coverage",
     "analyze": "tsx src/cli/analyze.ts",
     "caption": "tsx src/cli/caption.ts",
-    "doctor": "tsx src/cli/doctor.ts",
-    "profile": "tsx src/cli/profile.ts"
+    "doctor": "tsx src/cli/doctor.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
