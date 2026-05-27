@@ -27,7 +27,7 @@ const mockResult: CaptionResult = {
 describe('GenerateCaption', () => {
   it('calls provider.generateCaption exactly once with the request object', async () => {
     const provider = makeProvider();
-    vi.mocked(provider.generateCaption).mockResolvedValue(mockResult);
+    vi.mocked(provider).generateCaption.mockResolvedValue(mockResult);
 
     const useCase = new GenerateCaption(provider);
     await useCase.execute(mockRequest);
@@ -38,7 +38,7 @@ describe('GenerateCaption', () => {
 
   it('returns the resolved value from provider.generateCaption', async () => {
     const provider = makeProvider();
-    vi.mocked(provider.generateCaption).mockResolvedValue(mockResult);
+    vi.mocked(provider).generateCaption.mockResolvedValue(mockResult);
 
     const useCase = new GenerateCaption(provider);
     const result = await useCase.execute(mockRequest);
@@ -49,7 +49,7 @@ describe('GenerateCaption', () => {
   it('propagates errors thrown by provider.generateCaption', async () => {
     const provider = makeProvider();
     const error = new Error('Caption provider failure');
-    vi.mocked(provider.generateCaption).mockRejectedValue(error);
+    vi.mocked(provider).generateCaption.mockRejectedValue(error);
 
     const useCase = new GenerateCaption(provider);
 

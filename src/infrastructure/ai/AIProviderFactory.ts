@@ -21,5 +21,5 @@ export function createAIProvider(configPath?: string): AIProvider {
     return new GeminiProvider(config);
   }
 
-  throw new Error(`Unknown provider: ${config.ai.provider}`);
+  throw new Error(`Unknown provider: ${String(config.ai.provider)}`);
 }

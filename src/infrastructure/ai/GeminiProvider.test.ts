@@ -31,7 +31,7 @@ const makeCaptionReq = (): CaptionRequest => ({
 
 const makeGeminiResponse = (jsonBody: string) => ({
   ok: true,
-  json: async () => ({
+  json: () => Promise.resolve({
     candidates: [{
       content: {
         parts: [{ text: jsonBody }],
@@ -44,7 +44,7 @@ const makeErrorResponse = (status: number, statusText: string) => ({
   ok: false,
   status,
   statusText,
-  json: async () => ({ error: { message: `Error ${status}` } }),
+  json: () => Promise.resolve({ error: { message: `Error ${status}` } }),
 });
 
 describe('GeminiProvider', () => {
