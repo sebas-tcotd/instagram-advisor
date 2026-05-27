@@ -13,7 +13,7 @@ A brownfield restructure of a working Instagram advisor tool: migrate the plain-
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - TypeScript + Clean Architecture + multi-provider: the codebase compiles in TS with proper layers and existing agents work through the new architecture
+- [x] **Phase 1: Foundation** - TypeScript + Clean Architecture + multi-provider: the codebase compiles in TS with proper layers and existing agents work through the new architecture (completed 2026-05-27)
 - [ ] **Phase 2: Profile Auditor** - Complete third agent end-to-end: CLI script + UI tab + structured output
 - [ ] **Phase 3: UI Polish** - Tailwind CSS, responsive layout, dark mode, clipboard copy, three-tab navigation
 - [ ] **Phase 4: Ship-Ready** - Doctor update, env docs, conventional commits, LICENSE, v0.1.0 tag, GitHub Release Notes
@@ -52,7 +52,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 01-06-PLAN.md — UI layer migration (App.tsx split, components, hooks with ?raw prompt loading; human verify)
+- [x] 01-06-PLAN.md — UI layer migration (App.tsx split, components, hooks with ?raw prompt loading; human verify)
 
 ### Phase 2: Profile Auditor
 
@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 5/6 | In Progress|  |
+| 1. Foundation | 6/6 | Complete   | 2026-05-27 |
 | 2. Profile Auditor | 0/TBD | Not started | - |
 | 3. UI Polish | 0/TBD | Not started | - |
 | 4. Ship-Ready | 0/TBD | Not started | - |
