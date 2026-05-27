@@ -45,6 +45,20 @@ if (!mimeType) {
 
 const imageBase64 = readFileSync(photoPath).toString('base64');
 
+const VALID_FORMATS = ['post_individual', 'carrusel', 'historia', 'reel'] as const;
+type Format = typeof VALID_FORMATS[number];
+if (!VALID_FORMATS.includes(format as Format)) {
+  console.error(`\n${RED}Formato no válido: "${format}". Opciones: ${VALID_FORMATS.join(', ')}${RESET}\n`);
+  process.exit(1);
+}
+
+const VALID_LAYERS = ['externa', 'interna', 'engineer'] as const;
+type Layer = typeof VALID_LAYERS[number];
+if (!VALID_LAYERS.includes(layer as Layer)) {
+  console.error(`\n${RED}Capa no válida: "${layer}". Opciones: ${VALID_LAYERS.join(', ')}${RESET}\n`);
+  process.exit(1);
+}
+
 console.log(`\n${BOLD}post-advisor${RESET} ${DIM}@sebas_tcotd${RESET}`);
 console.log(`${DIM}Foto: ${photo} · Formato: ${format} · Capa: ${layer}${RESET}`);
 console.log(`${DIM}Analizando...${RESET}\n`);
@@ -55,8 +69,8 @@ try {
   const result = await useCase.execute({
     imageBase64,
     mimeType,
-    format: format as 'post_individual' | 'carrusel' | 'historia' | 'reel',
-    layer: layer as 'externa' | 'interna' | 'engineer',
+    format: format as Format,
+    layer: layer as Layer,
     caption: caption ?? undefined,
   });
 

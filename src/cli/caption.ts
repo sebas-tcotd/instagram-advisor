@@ -42,6 +42,13 @@ if (!mimeType) {
 
 const imageBase64 = readFileSync(photoPath).toString('base64');
 
+const VALID_TONES = ['narrativo', 'introspectivo', 'sensorial', 'proceso', 'tensión'] as const;
+type Tone = typeof VALID_TONES[number];
+if (!VALID_TONES.includes(tone as Tone)) {
+  console.error(`\n${RED}Tono no válido: "${tone}". Opciones: ${VALID_TONES.join(', ')}${RESET}\n`);
+  process.exit(1);
+}
+
 console.log(`\n${BOLD}caption-generator${RESET} ${DIM}@sebas_tcotd${RESET}`);
 console.log(`${DIM}Foto: ${photo} · Tono preferido: ${tone}${RESET}`);
 console.log(`${DIM}Generando...${RESET}\n`);
@@ -52,7 +59,7 @@ try {
   const result = await useCase.execute({
     imageBase64,
     mimeType,
-    tone: tone as 'narrativo' | 'introspectivo' | 'sensorial' | 'proceso' | 'tensión',
+    tone: tone as Tone,
   });
 
   result.captions?.forEach((c, i) => {
