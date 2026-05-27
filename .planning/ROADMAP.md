@@ -43,8 +43,8 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-03-PLAN.md — Infrastructure layer (loadConfig, GeminiProvider, AnthropicProvider, AIProviderFactory + tests)
-- [ ] 01-04-PLAN.md — Application use cases (AnalyzePost, GenerateCaption, AuditProfile scaffold + tests)
+- [x] 01-03-PLAN.md — Infrastructure layer (loadConfig, GeminiProvider, AnthropicProvider, AIProviderFactory + tests)
+- [x] 01-04-PLAN.md — Application use cases (AnalyzePost, GenerateCaption, AuditProfile scaffold + tests)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/6 | In Progress|  |
+| 1. Foundation | 4/6 | In Progress|  |
 | 2. Profile Auditor | 0/TBD | Not started | - |
 | 3. UI Polish | 0/TBD | Not started | - |
 | 4. Ship-Ready | 0/TBD | Not started | - |
