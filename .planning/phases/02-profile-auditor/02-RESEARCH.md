@@ -537,7 +537,7 @@ async auditProfile(profileYaml: string): Promise<AuditResult> {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does `assembleSystemPrompt` need a variant that skips profile.yaml injection for the profile audit?**
    - What we know: `assembleSystemPrompt` always appends `profile.yaml` to the system prompt (it's the third context item). For `auditProfile()`, the profile YAML is also the user message.
