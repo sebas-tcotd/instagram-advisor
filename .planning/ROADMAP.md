@@ -66,7 +66,16 @@ Plans:
   2. The web UI has a Profile tab that calls the AuditProfile use case and renders the response
   3. The audit result visibly includes: an overall score, at least one strength, at least one improvement area, and at least one concrete recommendation
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Domain entity + provider implementations + tests (AuditResult schema update, GeminiProvider.auditProfile(), AnthropicProvider.auditProfile(), AuditProfile use case tests)
+
+**Wave 2** *(blocked on Wave 1 completion — parallel)*
+
+- [ ] 02-02-PLAN.md — CLI profile entry point (src/cli/profile.ts + package.json script + human smoke test)
+- [ ] 02-03-PLAN.md — UI Profile tab (ProfilePage.tsx, PriorityBadge.tsx, useAuditProfile hook, App.tsx tab extension + human verify)
 
 ### Phase 3: UI Polish
 
@@ -107,6 +116,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 6/6 | Complete   | 2026-05-27 |
-| 2. Profile Auditor | 0/TBD | Not started | - |
+| 2. Profile Auditor | 0/3 | Not started | - |
 | 3. UI Polish | 0/TBD | Not started | - |
 | 4. Ship-Ready | 0/TBD | Not started | - |
