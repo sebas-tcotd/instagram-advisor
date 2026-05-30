@@ -53,7 +53,7 @@ export function loadConfig(configPath?: string): AppConfig {
 
   // Warn (not throw) when model name is not in the known allowlist — allows pre-release names.
   // Update these lists when new stable models are released.
-  const KNOWN_GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash'];
+  const KNOWN_GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-3.5-flash'];
   const KNOWN_ANTHROPIC_MODELS = ['claude-3-5-sonnet-20241022', 'claude-sonnet-4-20250514'];
   const knownModels = parsed.ai.provider === 'anthropic' ? KNOWN_ANTHROPIC_MODELS : KNOWN_GEMINI_MODELS;
   if (!knownModels.includes(parsed.ai.model)) {
