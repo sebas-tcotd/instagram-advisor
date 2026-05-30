@@ -70,7 +70,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Domain entity + provider implementations + tests (AuditResult schema update, GeminiProvider.auditProfile(), AnthropicProvider.auditProfile(), AuditProfile use case tests)
+- [x] 02-01-PLAN.md — Domain entity + provider implementations + tests (AuditResult schema update, GeminiProvider.auditProfile(), AnthropicProvider.auditProfile(), AuditProfile use case tests)
 
 **Wave 2** *(blocked on Wave 1 completion — parallel)*
 
@@ -116,6 +116,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 6/6 | Complete   | 2026-05-27 |
-| 2. Profile Auditor | 0/3 | Not started | - |
+| 2. Profile Auditor | 1/3 | In Progress|  |
 | 3. UI Polish | 0/TBD | Not started | - |
 | 4. Ship-Ready | 0/TBD | Not started | - |
