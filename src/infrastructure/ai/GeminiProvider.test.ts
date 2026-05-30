@@ -165,7 +165,7 @@ describe('GeminiProvider', () => {
       expect(result.overallScore).toBe(7);
       expect(typeof result.status).toBe('string');
       expect(result.checklist[0].priority).toBe('urgente');
-      expect(result.wins[0]).toBe('Feed B&N consistente');
+      expect(result.wins?.[0]).toBe('Feed B&N consistente');
     });
 
     it('throws error containing "missing required AuditResult fields" when status/checklist missing', async () => {

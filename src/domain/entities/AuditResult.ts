@@ -24,5 +24,5 @@ export interface AuditResult {
    * Strengths already working well that should be maintained.
    * Satisfies PROF-03: audit must surface at least one strength.
    */
-  wins: string[]
+  wins?: string[]   // AI may omit — callers must guard
 }
