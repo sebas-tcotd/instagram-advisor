@@ -16,7 +16,7 @@ const RESET = '\x1b[0m';
 console.log(`\n${BOLD}profile-auditor${RESET} ${DIM}@sebas_tcotd${RESET}`);
 console.log(`${DIM}Auditando perfil...${RESET}\n`);
 
-try {
+async function main() {
   const config = loadConfig();
   const profileYaml = readFileSync(resolve(process.cwd(), config.profile_path), 'utf8');
   const provider = createAIProvider();
@@ -62,7 +62,9 @@ try {
     }
     console.log('');
   }
-} catch (e) {
+}
+
+main().catch((e) => {
   console.error(`\n${RED}Error: ${e instanceof Error ? e.message : String(e)}${RESET}\n`);
   process.exit(1);
-}
+});
