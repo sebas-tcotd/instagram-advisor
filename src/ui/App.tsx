@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { AnalyzePage } from './pages/AnalyzePage'
 import { CaptionPage } from './pages/CaptionPage'
+import { ProfilePage } from './pages/ProfilePage'
 
 interface ImageState { base64: string; type: string; url: string }
 
@@ -34,7 +35,7 @@ const s = {
   empty: { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', height: '100%', gap: 8, color: 'var(--text-3)', fontSize: 11, letterSpacing: '0.04em' },
 }
 
-type Tab = 'analyze' | 'caption'
+type Tab = 'analyze' | 'caption' | 'profile'
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('analyze')
@@ -76,7 +77,7 @@ export default function App() {
         {/* LEFT PANEL — image upload */}
         <div style={s.panel}>
           <div style={s.tabs}>
-            {([['analyze', 'analizar post'], ['caption', 'generar caption']] as [Tab, string][]).map(([val, lbl]) => (
+            {([['analyze', 'analizar post'], ['caption', 'generar caption'], ['profile', 'perfil']] as [Tab, string][]).map(([val, lbl]) => (
               <button key={val} style={s.tab(tab === val)} onClick={() => setTab(val)}>
                 {lbl}
               </button>
@@ -123,6 +124,7 @@ export default function App() {
         <div style={s.right}>
           {tab === 'analyze' && <AnalyzePage image={image} />}
           {tab === 'caption' && <CaptionPage image={image} />}
+          {tab === 'profile' && <ProfilePage />}
         </div>
       </div>
     </div>
