@@ -8,7 +8,7 @@ import configRaw from '@root/config.yaml?raw'
 
 import type { PostAnalysisResult } from '../../domain/entities/PostAnalysisResult'
 import type { CaptionResult } from '../../domain/entities/CaptionResult'
-import type { AuditResult } from '../../domain/entities/AuditResult'
+import type { AuditResult, Priority } from '../../domain/entities/AuditResult'
 
 // Detect model and max_tokens from config.yaml at Vite build time
 const model = configRaw.match(/model:\s*(\S+)/)?.[1] ?? 'gemini-2.0-flash'
@@ -280,12 +280,33 @@ export function useAuditProfile() {
         throw new Error('Gemini devolvió JSON con formato inesperado.')
       }
       const obj = parsed as Record<string, unknown>
+
+      // WR-02: throw instead of silently defaulting to 0 when overall is missing or unparseable
       const overallRaw = obj['overall'] as string | undefined
-      const overallScore = overallRaw ? parseInt(overallRaw.split('/')[0], 10) : 0
+      const parsedScore = overallRaw ? parseInt(overallRaw.split('/')[0], 10) : NaN
+      if (!overallRaw || isNaN(parsedScore)) {
+        throw new Error('Respuesta de Gemini tiene un campo "overall" inválido o ausente.')
+      }
+      const overallScore = parsedScore
+
+      // WR-03: validate checklist item shapes to surface data quality issues early
+      const VALID_PRIORITIES: readonly Priority[] = ['urgente', 'importante', 'mejora']
+      const rawChecklist = Array.isArray(obj['checklist']) ? obj['checklist'] as Record<string, unknown>[] : []
+      for (const item of rawChecklist) {
+        if (
+          typeof item['element'] !== 'string' ||
+          typeof item['issue'] !== 'string' ||
+          typeof item['action'] !== 'string' ||
+          !VALID_PRIORITIES.includes(item['priority'] as Priority)
+        ) {
+          throw new Error(`Checklist item inválido: falta campo requerido o priority desconocida ("${String(item['priority'])}")`)
+        }
+      }
+
       const auditResult: AuditResult = {
-        overallScore: isNaN(overallScore) ? 0 : overallScore,
+        overallScore,
         status: (obj['status'] as string | undefined) ?? '',
-        checklist: Array.isArray(obj['checklist']) ? (obj['checklist'] as AuditResult['checklist']) : [],
+        checklist: rawChecklist as unknown as AuditResult['checklist'],
         wins: Array.isArray(obj['wins']) ? (obj['wins'] as string[]) : [],
       }
       setResult(auditResult)
