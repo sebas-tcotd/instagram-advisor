@@ -45,26 +45,23 @@ function validateCaptionResult(parsed: unknown): CaptionResult {
   return parsed as CaptionResult;
 }
 
-async function callGemini(
+async function callGeminiInternal(
   apiKey: string,
   model: string,
   systemPrompt: string,
-  imageBase64: string,
-  mimeType: string,
   userText: string,
   maxTokens: number,
+  image?: { base64: string; mimeType: string },
 ): Promise<unknown> {
   const url = `${GEMINI_BASE_URL}/${model}:generateContent`;
+  const parts = [
+    ...(image ? [{ inlineData: { mimeType: image.mimeType, data: image.base64 } }] : []),
+    { text: userText },
+  ];
   const body = {
     systemInstruction: { parts: [{ text: systemPrompt }] },
     generationConfig: { maxOutputTokens: maxTokens },
-    contents: [{
-      role: 'user',
-      parts: [
-        { inlineData: { mimeType, data: imageBase64 } },
-        { text: userText },
-      ],
-    }],
+    contents: [{ role: 'user', parts }],
   };
 
   const res = await fetch(url, {
@@ -92,9 +89,9 @@ async function callGemini(
     throw new Error(`Gemini bloqueó la respuesta: ${reason}`);
   }
 
-  const parts = (data['candidates'] as Record<string, unknown>[] | undefined)
+  const content = (data['candidates'] as Record<string, unknown>[] | undefined)
     ?.[0]?.['content'] as Record<string, unknown> | undefined;
-  const responseText = (parts?.['parts'] as Record<string, unknown>[] | undefined)
+  const responseText = (content?.['parts'] as Record<string, unknown>[] | undefined)
     ?.map((p) => p['text'])
     .filter(Boolean)
     .join('')
@@ -117,73 +114,26 @@ async function callGemini(
   }
 }
 
-async function callGeminiText(
+function callGemini(
+  apiKey: string,
+  model: string,
+  systemPrompt: string,
+  imageBase64: string,
+  mimeType: string,
+  userText: string,
+  maxTokens: number,
+): Promise<unknown> {
+  return callGeminiInternal(apiKey, model, systemPrompt, userText, maxTokens, { base64: imageBase64, mimeType });
+}
+
+function callGeminiText(
   apiKey: string,
   model: string,
   systemPrompt: string,
   userText: string,
   maxTokens: number,
 ): Promise<unknown> {
-  const url = `${GEMINI_BASE_URL}/${model}:generateContent`;
-  const body = {
-    systemInstruction: { parts: [{ text: systemPrompt }] },
-    generationConfig: { maxOutputTokens: maxTokens },
-    contents: [{
-      role: 'user',
-      parts: [
-        { text: userText },
-      ],
-    }],
-  };
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-goog-api-key': apiKey,
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    let detail = res.statusText;
-    try {
-      const err = await res.json() as Record<string, unknown>;
-      detail = (err['error'] as Record<string, unknown> | undefined)?.['message'] as string ?? JSON.stringify(err);
-    } catch { /* use statusText */ }
-    throw new Error(`Gemini API ${res.status}: ${detail}`);
-  }
-
-  const data = await res.json() as Record<string, unknown>;
-  const feedback = data['promptFeedback'] as Record<string, unknown> | undefined;
-  if (feedback?.['blockReason']) {
-    const reason = typeof feedback['blockReason'] === 'string' ? feedback['blockReason'] : JSON.stringify(feedback['blockReason']);
-    throw new Error(`Gemini bloqueó la respuesta: ${reason}`);
-  }
-
-  const parts = (data['candidates'] as Record<string, unknown>[] | undefined)
-    ?.[0]?.['content'] as Record<string, unknown> | undefined;
-  const responseText = (parts?.['parts'] as Record<string, unknown>[] | undefined)
-    ?.map((p) => p['text'])
-    .filter(Boolean)
-    .join('')
-    .trim();
-
-  if (!responseText) {
-    throw new Error('Gemini returned an empty response');
-  }
-
-  const stripped = responseText.replace(/^```(?:json)?\n?|```$/gm, '').trim();
-  try {
-    return JSON.parse(stripped) as unknown;
-  } catch {
-    const match = stripped.match(/\{[\s\S]*\}/);
-    try {
-      return JSON.parse(match ? match[0] : stripped) as unknown;
-    } catch (err) {
-      throw new Error(`Gemini response is not valid JSON: ${String(err)}`, { cause: err });
-    }
-  }
+  return callGeminiInternal(apiKey, model, systemPrompt, userText, maxTokens);
 }
 
 const VALID_PRIORITIES: readonly Priority[] = ['urgente', 'importante', 'mejora'];
