@@ -190,6 +190,7 @@ describe('AnthropicProvider', () => {
 
       expect(mockCreate).toHaveBeenCalledWith(
         expect.objectContaining({
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           messages: expect.arrayContaining([
             expect.objectContaining({
               content: [{ type: 'text', text: 'profile yaml content' }],

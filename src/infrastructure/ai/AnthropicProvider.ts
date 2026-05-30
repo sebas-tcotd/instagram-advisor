@@ -4,7 +4,7 @@ import type { AnalyzeRequest } from '../../domain/entities/AnalyzeRequest';
 import type { CaptionRequest } from '../../domain/entities/CaptionRequest';
 import type { PostAnalysisResult, Verdict } from '../../domain/entities/PostAnalysisResult';
 import type { CaptionResult } from '../../domain/entities/CaptionResult';
-import type { AuditResult } from '../../domain/entities/AuditResult';
+import type { AuditResult, ChecklistItem, Priority } from '../../domain/entities/AuditResult';
 import type { AppConfig } from '../config/loadConfig';
 import { assembleSystemPrompt } from './promptUtils';
 
@@ -42,6 +42,45 @@ function validateCaptionResult(parsed: unknown): CaptionResult {
     }
   }
   return parsed as CaptionResult;
+}
+
+const VALID_PRIORITIES: readonly Priority[] = ['urgente', 'importante', 'mejora'];
+
+function validateAuditResult(parsed: unknown): AuditResult {
+  const obj = parsed as Record<string, unknown>;
+  if (
+    !obj ||
+    typeof obj['overall'] !== 'string' ||
+    typeof obj['status'] !== 'string' ||
+    !Array.isArray(obj['checklist'])
+  ) {
+    throw new Error('Anthropic response missing required AuditResult fields');
+  }
+
+  const overallStr = obj['overall'];
+  const overallScore = parseInt(overallStr.split('/')[0], 10);
+  if (isNaN(overallScore)) {
+    throw new Error(`Cannot parse overallScore from "${overallStr}"`);
+  }
+
+  for (const item of obj['checklist'] as unknown[]) {
+    const c = item as Record<string, unknown>;
+    if (
+      typeof c['element'] !== 'string' ||
+      typeof c['issue'] !== 'string' ||
+      typeof c['action'] !== 'string' ||
+      !VALID_PRIORITIES.includes(c['priority'] as Priority)
+    ) {
+      throw new Error('Anthropic checklist item missing required fields (priority, element, issue, action)');
+    }
+  }
+
+  return {
+    overallScore,
+    status: obj['status'],
+    checklist: obj['checklist'] as ChecklistItem[],
+    wins: Array.isArray(obj['wins']) ? (obj['wins'] as string[]) : [],
+  };
 }
 
 function extractJSON(raw: string): unknown {
@@ -109,8 +148,21 @@ export class AnthropicProvider implements AIProvider {
     return validateCaptionResult(parsed);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  auditProfile(_profileYaml: string): Promise<AuditResult> {
-    return Promise.reject(new Error('AuditProfile not implemented — Phase 2'));
+  async auditProfile(profileYaml: string): Promise<AuditResult> {
+    const systemPrompt = assembleSystemPrompt('profile-auditor.md', this.config);
+
+    const response = await this.client.messages.create({
+      model: this.config.ai.model,
+      max_tokens: this.config.ai.max_tokens,
+      system: systemPrompt,
+      messages: [{
+        role: 'user',
+        content: [{ type: 'text', text: profileYaml }],
+      }],
+    });
+
+    const raw = response.content.map((b) => (b.type === 'text' ? b.text : '')).join('').trim();
+    const parsed = extractJSON(raw);
+    return validateAuditResult(parsed);
   }
 }

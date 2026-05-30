@@ -3,7 +3,7 @@ import type { AnalyzeRequest } from '../../domain/entities/AnalyzeRequest';
 import type { CaptionRequest } from '../../domain/entities/CaptionRequest';
 import type { PostAnalysisResult, Verdict } from '../../domain/entities/PostAnalysisResult';
 import type { CaptionResult } from '../../domain/entities/CaptionResult';
-import type { AuditResult } from '../../domain/entities/AuditResult';
+import type { AuditResult, ChecklistItem, Priority } from '../../domain/entities/AuditResult';
 import type { AppConfig } from '../config/loadConfig';
 import { assembleSystemPrompt } from './promptUtils';
 
@@ -117,6 +117,114 @@ async function callGemini(
   }
 }
 
+async function callGeminiText(
+  apiKey: string,
+  model: string,
+  systemPrompt: string,
+  userText: string,
+  maxTokens: number,
+): Promise<unknown> {
+  const url = `${GEMINI_BASE_URL}/${model}:generateContent`;
+  const body = {
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+    generationConfig: { maxOutputTokens: maxTokens },
+    contents: [{
+      role: 'user',
+      parts: [
+        { text: userText },
+      ],
+    }],
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': apiKey,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    let detail = res.statusText;
+    try {
+      const err = await res.json() as Record<string, unknown>;
+      detail = (err['error'] as Record<string, unknown> | undefined)?.['message'] as string ?? JSON.stringify(err);
+    } catch { /* use statusText */ }
+    throw new Error(`Gemini API ${res.status}: ${detail}`);
+  }
+
+  const data = await res.json() as Record<string, unknown>;
+  const feedback = data['promptFeedback'] as Record<string, unknown> | undefined;
+  if (feedback?.['blockReason']) {
+    const reason = typeof feedback['blockReason'] === 'string' ? feedback['blockReason'] : JSON.stringify(feedback['blockReason']);
+    throw new Error(`Gemini bloqueó la respuesta: ${reason}`);
+  }
+
+  const parts = (data['candidates'] as Record<string, unknown>[] | undefined)
+    ?.[0]?.['content'] as Record<string, unknown> | undefined;
+  const responseText = (parts?.['parts'] as Record<string, unknown>[] | undefined)
+    ?.map((p) => p['text'])
+    .filter(Boolean)
+    .join('')
+    .trim();
+
+  if (!responseText) {
+    throw new Error('Gemini returned an empty response');
+  }
+
+  const stripped = responseText.replace(/^```(?:json)?\n?|```$/gm, '').trim();
+  try {
+    return JSON.parse(stripped) as unknown;
+  } catch {
+    const match = stripped.match(/\{[\s\S]*\}/);
+    try {
+      return JSON.parse(match ? match[0] : stripped) as unknown;
+    } catch (err) {
+      throw new Error(`Gemini response is not valid JSON: ${String(err)}`, { cause: err });
+    }
+  }
+}
+
+const VALID_PRIORITIES: readonly Priority[] = ['urgente', 'importante', 'mejora'];
+
+function validateAuditResult(parsed: unknown): AuditResult {
+  const obj = parsed as Record<string, unknown>;
+  if (
+    !obj ||
+    typeof obj['overall'] !== 'string' ||
+    typeof obj['status'] !== 'string' ||
+    !Array.isArray(obj['checklist'])
+  ) {
+    throw new Error('Gemini response missing required AuditResult fields');
+  }
+
+  const overallStr = obj['overall'];
+  const overallScore = parseInt(overallStr.split('/')[0], 10);
+  if (isNaN(overallScore)) {
+    throw new Error(`Cannot parse overallScore from "${overallStr}"`);
+  }
+
+  for (const item of obj['checklist'] as unknown[]) {
+    const c = item as Record<string, unknown>;
+    if (
+      typeof c['element'] !== 'string' ||
+      typeof c['issue'] !== 'string' ||
+      typeof c['action'] !== 'string' ||
+      !VALID_PRIORITIES.includes(c['priority'] as Priority)
+    ) {
+      throw new Error('Gemini checklist item missing required fields (priority, element, issue, action)');
+    }
+  }
+
+  return {
+    overallScore,
+    status: obj['status'],
+    checklist: obj['checklist'] as ChecklistItem[],
+    wins: Array.isArray(obj['wins']) ? (obj['wins'] as string[]) : [],
+  };
+}
+
 export class GeminiProvider implements AIProvider {
   constructor(private readonly config: AppConfig) {}
 
@@ -150,8 +258,15 @@ export class GeminiProvider implements AIProvider {
     return validateCaptionResult(parsed);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  auditProfile(_profileYaml: string): Promise<AuditResult> {
-    return Promise.reject(new Error('AuditProfile not implemented — Phase 2'));
+  async auditProfile(profileYaml: string): Promise<AuditResult> {
+    const systemPrompt = assembleSystemPrompt('profile-auditor.md', this.config);
+    const parsed = await callGeminiText(
+      this.config.apiKey,
+      this.config.ai.model,
+      systemPrompt,
+      profileYaml,
+      this.config.ai.max_tokens,
+    );
+    return validateAuditResult(parsed);
   }
 }
