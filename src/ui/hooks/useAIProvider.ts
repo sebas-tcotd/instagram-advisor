@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import postAdvisorPrompt from '@prompts/post-advisor.md?raw'
 import captionPrompt from '@prompts/caption-generator.md?raw'
+import profileAuditorPrompt from '@prompts/profile-auditor.md?raw'
 import strategyPrompt from '@prompts/strategy.md?raw'
 import profileRaw from '@root/profile.yaml?raw'
 import configRaw from '@root/config.yaml?raw'
 
 import type { PostAnalysisResult } from '../../domain/entities/PostAnalysisResult'
 import type { CaptionResult } from '../../domain/entities/CaptionResult'
+import type { AuditResult } from '../../domain/entities/AuditResult'
 
 // Detect model and max_tokens from config.yaml at Vite build time
 const model = configRaw.match(/model:\s*(\S+)/)?.[1] ?? 'gemini-2.0-flash'
@@ -43,6 +45,86 @@ async function callGemini(
         role: 'user',
         parts: [
           { inlineData: { mimeType, data: imageBase64 } },
+          { text: userText },
+        ],
+      },
+    ],
+  }
+
+  const res = await fetch(`${GEMINI_API_URL}/${model}:generateContent`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': API_KEY,
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (!res.ok) {
+    let detail = res.statusText
+    try {
+      const err = await res.json() as { error?: { message?: string } }
+      detail = err.error?.message ?? JSON.stringify(err)
+    } catch {
+      // fallback to statusText
+    }
+    throw new Error(`Gemini API ${res.status}: ${detail}`)
+  }
+
+  const data = await res.json() as {
+    promptFeedback?: { blockReason?: string }
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>
+  }
+
+  if (data?.promptFeedback?.blockReason) {
+    throw new Error(`Gemini bloqueó la respuesta: ${data.promptFeedback.blockReason}`)
+  }
+
+  const responseText = data?.candidates?.[0]?.content?.parts
+    ?.map((part) => part.text)
+    .filter(Boolean)
+    .join('')
+    .trim()
+
+  if (!responseText) {
+    const finishReason = data?.candidates?.[0]?.finishReason
+    throw new Error(
+      finishReason
+        ? `Gemini no devolvió texto (finishReason: ${finishReason}).`
+        : 'Gemini no devolvió ningún texto.'
+    )
+  }
+
+  const stripped = responseText.replace(/^```(?:json)?\n?|```$/gm, '').trim()
+  try {
+    return JSON.parse(stripped) as unknown
+  } catch {
+    const match = stripped.match(/\{[\s\S]*\}/)
+    try {
+      return JSON.parse(match ? match[0] : stripped) as unknown
+    } catch (err) {
+      throw new Error(`La respuesta de Gemini no es JSON válido. ${(err as Error).message}`, { cause: err })
+    }
+  }
+}
+
+async function callGeminiText(
+  systemPrompt: string,
+  userText: string
+): Promise<unknown> {
+  if (!API_KEY) {
+    throw new Error('No se encontró ninguna API key válida en el .env (se intentó VITE_GEMINI_API_KEY y VITE_ANTHROPIC_API_KEY).')
+  }
+
+  const body = {
+    systemInstruction: {
+      parts: [{ text: systemPrompt }],
+    },
+    generationConfig: { maxOutputTokens: maxTokens },
+    contents: [
+      {
+        role: 'user',
+        parts: [
           { text: userText },
         ],
       },
@@ -172,6 +254,41 @@ export function useGenerateCaption() {
         throw new Error('Gemini devolvió JSON con formato inesperado.')
       }
       setResult(parsed as CaptionResult)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { loading, result, error, run }
+}
+
+export function useAuditProfile() {
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState<AuditResult | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const run = async () => {
+    setLoading(true); setResult(null); setError(null)
+    try {
+      const parsed = await callGeminiText(
+        buildSystemPrompt(profileAuditorPrompt),
+        profileRaw
+      )
+      if (!parsed || typeof parsed !== 'object') {
+        throw new Error('Gemini devolvió JSON con formato inesperado.')
+      }
+      const obj = parsed as Record<string, unknown>
+      const overallRaw = obj['overall'] as string | undefined
+      const overallScore = overallRaw ? parseInt(overallRaw.split('/')[0], 10) : 0
+      const auditResult: AuditResult = {
+        overallScore: isNaN(overallScore) ? 0 : overallScore,
+        status: (obj['status'] as string | undefined) ?? '',
+        checklist: Array.isArray(obj['checklist']) ? (obj['checklist'] as AuditResult['checklist']) : [],
+        wins: Array.isArray(obj['wins']) ? (obj['wins'] as string[]) : [],
+      }
+      setResult(auditResult)
     } catch (e) {
       setError((e as Error).message)
     } finally {
