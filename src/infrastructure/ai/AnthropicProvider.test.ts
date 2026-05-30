@@ -128,9 +128,74 @@ describe('AnthropicProvider', () => {
   });
 
   describe('auditProfile', () => {
-    it('throws Error with Phase 2 message', async () => {
+    const validAuditResult = {
+      overall: '7/10',
+      status: 'El perfil tiene identidad visual clara pero la bio es débil.',
+      checklist: [
+        {
+          priority: 'urgente',
+          element: 'Bio',
+          issue: 'No responde qué haces ni desde dónde',
+          action: 'Reescribir con estructura identidad/ubicación/credencial',
+        },
+      ],
+      wins: ['Feed B&N consistente'],
+    };
+
+    it('returns AuditResult with parsed overallScore when Anthropic returns valid JSON', async () => {
+      mockCreate.mockResolvedValue(makeAnthropicResponse(JSON.stringify(validAuditResult)));
+
+      const result = await provider.auditProfile('profile yaml content');
+
+      expect(result.overallScore).toBe(7);
+      expect(typeof result.status).toBe('string');
+      expect(result.checklist[0].priority).toBe('urgente');
+      expect(result.wins[0]).toBe('Feed B&N consistente');
+    });
+
+    it('throws error containing "missing required AuditResult fields" when status/checklist missing', async () => {
+      const invalid = { overall: '7/10' }; // missing status and checklist
+      mockCreate.mockResolvedValue(makeAnthropicResponse(JSON.stringify(invalid)));
+
       await expect(provider.auditProfile('profile yaml')).rejects.toThrow(
-        'Phase 2',
+        'missing required AuditResult fields',
+      );
+    });
+
+    it('throws error containing "checklist item missing required fields" when priority is invalid', async () => {
+      const invalidPriority = {
+        ...validAuditResult,
+        checklist: [{ priority: 'critico', element: 'Bio', issue: 'bad', action: 'fix' }],
+      };
+      mockCreate.mockResolvedValue(makeAnthropicResponse(JSON.stringify(invalidPriority)));
+
+      await expect(provider.auditProfile('profile yaml')).rejects.toThrow(
+        'checklist item missing required fields',
+      );
+    });
+
+    it('throws error containing "Cannot parse overallScore" when overall is unparseable', async () => {
+      const unparseable = { ...validAuditResult, overall: 'siete' };
+      mockCreate.mockResolvedValue(makeAnthropicResponse(JSON.stringify(unparseable)));
+
+      await expect(provider.auditProfile('profile yaml')).rejects.toThrow(
+        'Cannot parse overallScore',
+      );
+    });
+
+    it('sends text-only content — no image block in messages', async () => {
+      mockCreate.mockResolvedValue(makeAnthropicResponse(JSON.stringify(validAuditResult)));
+
+      await provider.auditProfile('profile yaml content');
+
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          messages: expect.arrayContaining([
+            expect.objectContaining({
+              content: [{ type: 'text', text: 'profile yaml content' }],
+            }),
+          ]),
+        }),
       );
     });
   });
