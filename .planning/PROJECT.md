@@ -21,16 +21,16 @@ Un advisor de Instagram completo y arquitecturalmente ejemplar: cualquier develo
 - ✓ Prompt layer: strategy.md, post-advisor.md, caption-generator.md, profile-auditor.md — existing
 - ✓ profile.yaml como contexto estructurado de identidad — existing
 - ✓ Codebase mapeado (.planning/codebase/) — existing
+- ✓ Migración completa a TypeScript + tsconfig.json — Phase 1 (02-foundation)
+- ✓ Restructura en Clean Architecture: domain/ application/ infrastructure/ ui/ cli/ — Phase 1
+- ✓ Soporte multi-provider via config.yaml (Gemini + Anthropic) — Phase 1 + 2
+- ✓ AIProviderFactory que lea config.yaml y retorne el provider correcto — Phase 1
+- ✓ profile-auditor: CLI script (`npm run profile`) + tab en la web UI — Phase 2 (02-profile-auditor)
+- ✓ UI: tab de Profile en la web — Phase 2
 
 ### Active
 
-- [ ] Migración completa a TypeScript (toda la codebase, incluyendo vite.config.ts, tsconfig.json)
-- [ ] Restructura en Clean Architecture: domain/ application/ infrastructure/ ui/ cli/
-- [ ] Soporte multi-provider via config.yaml (Gemini + Anthropic en v1; OpenAI en v2)
-- [ ] AIProviderFactory que lea config.yaml y retorne el provider correcto
-- [ ] profile-auditor: CLI script + tab en la web UI
 - [ ] feed-reviewer: script Playwright standalone (sin UI tab) que scrapea los últimos 9 posts y evalúa coherencia del feed
-- [ ] UI: tab de Profile en la web
 - [ ] UI: dark/light mode toggle
 - [ ] UI: botón "copiar caption al clipboard" en CaptionCard
 - [ ] doctor script actualizado para verificar el provider configurado en config.yaml
@@ -66,11 +66,11 @@ Contexto de publicación: el repo será mostrado como ejemplo de Desarrollo Diri
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| TypeScript completo | Showcase de calidad de código + type safety real | — Pending |
-| Clean Architecture con ports/adapters | Demostrar SOLID aplicado; el AIProvider como abstracción es el ejemplo perfecto | — Pending |
-| Multi-provider via config.yaml | Ya se usa Gemini en UI y Anthropic en CLI; unificarlos es la necesidad inmediata | — Pending |
-| Feed-reviewer como script standalone (no UI) | Playwright + Instagram login es complejidad que no pertenece en la web UI | — Pending |
-| Sin OpenAI en v1 | Gemini + Anthropic cubren los casos activos; OpenAI es over-engineering para v1 | — Pending |
+| TypeScript completo | Showcase de calidad de código + type safety real | ✓ Implementado en Phase 1 |
+| Clean Architecture con ports/adapters | Demostrar SOLID aplicado; el AIProvider como abstracción es el ejemplo perfecto | ✓ Implementado en Phase 1 |
+| Multi-provider via config.yaml | Ya se usa Gemini en UI y Anthropic en CLI; unificarlos es la necesidad inmediata | ✓ Implementado en Phase 1–2 |
+| Feed-reviewer como script standalone (no UI) | Playwright + Instagram login es complejidad que no pertenece en la web UI | — Pending (Phase 3+) |
+| Sin OpenAI en v1 | Gemini + Anthropic cubren los casos activos; OpenAI es over-engineering para v1 | — Mantenido |
 
 ## Evolution
 
@@ -90,4 +90,4 @@ Este documento evoluciona en cada transición de fase y milestone.
 4. Actualizar Context con el estado actual
 
 ---
-*Last updated: 2026-05-26 after initialization*
+*Last updated: 2026-05-30 — Phase 2 (profile-auditor) complete*
