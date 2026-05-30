@@ -14,7 +14,7 @@ A brownfield restructure of a working Instagram advisor tool: migrate the plain-
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - TypeScript + Clean Architecture + multi-provider: the codebase compiles in TS with proper layers and existing agents work through the new architecture (completed 2026-05-27)
-- [ ] **Phase 2: Profile Auditor** - Complete third agent end-to-end: CLI script + UI tab + structured output
+- [x] **Phase 2: Profile Auditor** - Complete third agent end-to-end: CLI script + UI tab + structured output (completed 2026-05-30)
 - [ ] **Phase 3: UI Polish** - Tailwind CSS, responsive layout, dark mode, clipboard copy, three-tab navigation
 - [ ] **Phase 4: Ship-Ready** - Doctor update, env docs, conventional commits, LICENSE, v0.1.0 tag, GitHub Release Notes
 
@@ -74,8 +74,8 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion — parallel)*
 
-- [ ] 02-02-PLAN.md — CLI profile entry point (src/cli/profile.ts + package.json script + human smoke test)
-- [ ] 02-03-PLAN.md — UI Profile tab (ProfilePage.tsx, PriorityBadge.tsx, useAuditProfile hook, App.tsx tab extension + human verify)
+- [x] 02-02-PLAN.md — CLI profile entry point (src/cli/profile.ts + package.json script + human smoke test)
+- [x] 02-03-PLAN.md — UI Profile tab (ProfilePage.tsx, PriorityBadge.tsx, useAuditProfile hook, App.tsx tab extension + human verify)
 
 ### Phase 3: UI Polish
 
@@ -116,6 +116,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 6/6 | Complete   | 2026-05-27 |
-| 2. Profile Auditor | 1/3 | In Progress|  |
+| 2. Profile Auditor | 3/3 | Complete   | 2026-05-30 |
 | 3. UI Polish | 0/TBD | Not started | - |
 | 4. Ship-Ready | 0/TBD | Not started | - |
