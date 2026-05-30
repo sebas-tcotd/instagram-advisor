@@ -30,9 +30,9 @@ Requirements para el primer release público. Cada uno mapea a fases del roadmap
 
 ### Profile Auditor
 
-- [ ] **PROF-01**: El script CLI `npm run profile` (o `node cli/profile`) lee `profile.yaml` y llama al agente `profile-auditor`
-- [ ] **PROF-02**: La web UI tiene un tab "Profile" que ejecuta el `AuditProfile` use case y muestra los resultados
-- [ ] **PROF-03**: El resultado del profile audit muestra al menos: puntuación general, fortalezas, áreas de mejora, recomendaciones concretas
+- [x] **PROF-01**: El script CLI `npm run profile` (o `node cli/profile`) lee `profile.yaml` y llama al agente `profile-auditor`
+- [x] **PROF-02**: La web UI tiene un tab "Profile" que ejecuta el `AuditProfile` use case y muestra los resultados
+- [x] **PROF-03**: El resultado del profile audit muestra al menos: puntuación general, fortalezas, áreas de mejora, recomendaciones concretas
 
 ### UI
 
@@ -101,9 +101,9 @@ Actualizado durante la creación del roadmap.
 | AGNT-01 | Phase 1 | Pending |
 | AGNT-02 | Phase 1 | Pending |
 | AGNT-03 | Phase 1 | Pending |
-| PROF-01 | Phase 2 | Pending |
-| PROF-02 | Phase 2 | Pending |
-| PROF-03 | Phase 2 | Pending |
+| PROF-01 | Phase 2 | Complete |
+| PROF-02 | Phase 2 | Complete |
+| PROF-03 | Phase 2 | Complete |
 | UI-01 | Phase 3 | Pending |
 | UI-02 | Phase 3 | Pending |
 | UI-03 | Phase 3 | Pending |
